@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
 	"os"
 	"url-shortener/internal/config"
@@ -37,7 +38,9 @@ func main() {
 
 	// TODO init router: chi, "chi render"
 	router := chi.NewRouter()
-	_ = router
+	// добавляет идентификатор каждому запросу
+	router.Use(middleware.RequestID)
+	router.Use(middleware.RealIP) // ip пользователя
 
 	// TODO run server
 }
