@@ -48,6 +48,9 @@ func main() {
 	// своя реализация логгера для middleware
 	router.Use(mwLogger.New(log))
 
+	router.Use(middleware.Recoverer) // приложение не падает при плохом запросе
+	router.Use(middleware.URLFormat) // можно писать в хендлере красивые урлы типа /articles/{id}. И обращаться по {id}
+
 	// TODO run server
 }
 
