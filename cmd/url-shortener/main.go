@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"log/slog"
 	"os"
 	"url-shortener/internal/config"
@@ -32,14 +33,11 @@ func main() {
 		log.Error("failed to init storage", sl.Err(err))
 		os.Exit(1)
 	}
-	url, err := storage.GetUrl("xxx1")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(url)
 	_ = storage
 
 	// TODO init router: chi, "chi render"
+	router := chi.NewRouter()
+	_ = router
 
 	// TODO run server
 }
