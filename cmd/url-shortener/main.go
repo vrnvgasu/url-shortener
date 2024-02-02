@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"url-shortener/internal/config"
+	"url-shortener/internal/http-server/handlers/url/save"
 	mwLogger "url-shortener/internal/http-server/middleware/logger"
 	"url-shortener/internal/lib/logger/handlers/slogpretty"
 	"url-shortener/internal/lib/logger/sl"
@@ -51,6 +52,9 @@ func main() {
 
 	router.Use(middleware.Recoverer) // приложение не падает при плохом запросе
 	router.Use(middleware.URLFormat) // можно писать в хендлере красивые урлы типа /articles/{id}. И обращаться по {id}
+	router.Post("/url", save.New(log, storage))
+
+	log.Info("tarting server", slog.String("address", cnf.Address))
 
 	// TODO run server
 }
