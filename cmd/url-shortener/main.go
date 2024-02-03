@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
+	"net/http"
 	"os"
 	"url-shortener/internal/config"
 	"url-shortener/internal/http-server/handlers/url/save"
@@ -54,9 +55,22 @@ func main() {
 	router.Use(middleware.URLFormat) // можно писать в хендлере красивые урлы типа /articles/{id}. И обращаться по {id}
 	router.Post("/url", save.New(log, storage))
 
-	log.Info("tarting server", slog.String("address", cnf.Address))
+	log.Info("starting server", slog.String("address", cnf.Address))
 
 	// TODO run server
+	srv := http.Server{
+		Addr:         cnf.Address,
+		Handler:      router,
+		ReadTimeout:  cnf.Timeout,
+		WriteTimeout: cnf.Timeout,
+		IdleTimeout:  cnf.IdleTimeout,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		log.Error("failed to start server")
+	}
+
+	log.Error("server stopped")
 }
 
 // лог (вид и уровень) зависит от окружения: dev, prod и тд
