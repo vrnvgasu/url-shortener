@@ -29,6 +29,7 @@ type UrlSaver interface {
 
 const aliasLength = 6
 
+//go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=UrlSaver
 func New(log *slog.Logger, urlSaver UrlSaver) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.url.save.New"
