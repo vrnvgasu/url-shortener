@@ -56,8 +56,16 @@ func main() {
 	router.Use(middleware.Recoverer) // приложение не падает при плохом запросе
 	router.Use(middleware.URLFormat) // можно писать в хендлере красивые урлы типа /articles/{id}. И обращаться по {id}
 
-	router.Post("/url", save.New(log, storage))
-	router.Delete("/url/{alias}", urldelete.New(log, storage))
+	router.Route("/url", func(r chi.Router) {
+		r.Use(middleware.BasicAuth("url-shortener", map[string]string{
+			cnf.HTTPServer.User: cnf.HTTPServer.Password,
+			//cnf.HTTPServer.User: cnf.HTTPServer.Password, // может добавить других пользователей
+		}))
+
+		r.Post("/", save.New(log, storage))
+		r.Delete("/{alias}", urldelete.New(log, storage))
+	})
+
 	router.Get("/{alias}", redirect.New(log, storage))
 
 	log.Info("starting server", slog.String("address", cnf.Address))
