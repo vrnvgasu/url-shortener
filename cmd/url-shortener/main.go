@@ -10,6 +10,7 @@ import (
 	"url-shortener/internal/config"
 	"url-shortener/internal/http-server/handlers/url/redirect"
 	"url-shortener/internal/http-server/handlers/url/save"
+	"url-shortener/internal/http-server/handlers/url/urldelete"
 	mwLogger "url-shortener/internal/http-server/middleware/logger"
 	"url-shortener/internal/lib/logger/handlers/slogpretty"
 	"url-shortener/internal/lib/logger/sl"
@@ -56,6 +57,7 @@ func main() {
 	router.Use(middleware.URLFormat) // можно писать в хендлере красивые урлы типа /articles/{id}. И обращаться по {id}
 
 	router.Post("/url", save.New(log, storage))
+	router.Delete("/url/{alias}", urldelete.New(log, storage))
 	router.Get("/{alias}", redirect.New(log, storage))
 
 	log.Info("starting server", slog.String("address", cnf.Address))
