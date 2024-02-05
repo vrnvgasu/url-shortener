@@ -14,7 +14,7 @@ type UrlDeleter interface {
 }
 
 type Response struct {
-	Response resp.Response
+	resp.Response
 }
 
 //go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=UrlDeleter
