@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/ilyakaznacheev/cleanenv"
 	"log"
 	"os"
 	"time"
+
+	"github.com/ilyakaznacheev/cleanenv"
 )
 
 // полностью соответсвует структуре config/local.yaml
@@ -15,6 +16,8 @@ type Config struct {
 	Env         string `yaml:"env" env:"ENV" env-default:"local"`
 	StoragePath string `yaml:"storage_path" env-required:"true"`
 	HTTPServer  `yaml:"http_server"`
+	Clients     ClientsConfig `yaml:"clients"`
+	AppSecret   string        `yaml:"app_secret" env-required:"true" env:"APP_SECRET"`
 }
 
 type HTTPServer struct {
@@ -23,6 +26,17 @@ type HTTPServer struct {
 	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
 	User        string        `yaml:"user" env-required:"true"`
 	Password    string        `yaml:"password" env-required:"true" env:"HTTP_SERVER_PASSWORD"`
+}
+
+type Client struct {
+	Address      string        `yaml:"address"`
+	Timeout      time.Duration `yaml:"timeout"`
+	RetriesCount int           `yaml:"retriesCount"`
+	//Insecure     bool          `yaml:"insecure"`
+}
+
+type ClientsConfig struct {
+	SSO Client `yaml:"sso"`
 }
 
 // "Must" - сообщаем, что функция может кинуть панику

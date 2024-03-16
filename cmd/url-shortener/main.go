@@ -1,12 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
 	"net/http"
 	"os"
+	ssogrpc "url-shortener/internal/clients/sso/grpc"
 	"url-shortener/internal/config"
 	"url-shortener/internal/http-server/handlers/redirect"
 	"url-shortener/internal/http-server/handlers/url/save"
@@ -15,6 +15,9 @@ import (
 	"url-shortener/internal/lib/logger/handlers/slogpretty"
 	"url-shortener/internal/lib/logger/sl"
 	"url-shortener/internal/storage/sqlite"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 const (
@@ -33,6 +36,26 @@ func main() {
 	//log = log.With("env", cnf.Env) // добавляем параметр env ко всем логам
 	log.Info("starting application", slog.String("env", cnf.Env))
 	log.Debug("debug messages are enabled")
+
+	ssoClient, err := ssogrpc.New(
+		context.Background(),
+		log,
+		cnf.Clients.SSO.Address,
+		cnf.Clients.SSO.Timeout,
+		cnf.Clients.SSO.RetriesCount,
+	)
+	if err != nil {
+		log.Error("failed to init SSO client", sl.Err(err))
+		os.Exit(1)
+	}
+
+	// просто проверим работу grpc
+	isAdmin, err := ssoClient.IsAdmin(context.Background(), 1)
+	if err != nil {
+		log.Error("grpc failed", sl.Err(err))
+		os.Exit(1)
+	}
+	log.Info("grpc 'IsAdmin'", slog.Bool("isAdmin", isAdmin))
 
 	// TODO init storage: sqlite
 	storage, err := sqlite.New(cnf.StoragePath)
